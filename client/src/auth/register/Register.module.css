@@ -1,0 +1,43 @@
+:root {
+  /* default register width (can be overridden) */
+  --register-width: 500px;
+}
+
+.container {
+  width: var(--register-width);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.input {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* helper to reduce input font-size on small screens */
+.inputSmall {
+  font-size: 0.95rem;
+}
+
+/* Link/button under the register button */
+.link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  text-align: center;
+  color: var(--primary);
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

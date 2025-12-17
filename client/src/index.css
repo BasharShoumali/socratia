@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* Theme variables (light by default). Switch to dark by adding the `dark` class
+	 on the <html> element (e.g., document.documentElement.classList.add('dark')) */
+:root {
+  --bg: #f7f8fb;
+  --card-bg: #ffffff;
+  --text: #0f1724;
+  --muted: #6b7280;
+  --border: #e6e9ef;
+  --primary: #2563eb; /* blue-600 */
+  --primary-foreground: #ffffff;
+  --input-bg: #ffffff;
+}
+
+.dark {
+  --bg: #0b1220;
+  --card-bg: #071023;
+  --text: #e6eef8;
+  --muted: #9aa6b2;
+  --border: #20303f;
+  --primary: #4f8cff;
+  --primary-foreground: #061426;
+  --input-bg: #071326;
+}
+
+html,
+body,
+#root {
+  background: var(--bg);
+  color: var(--text);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* Utility components used by app */
+.card {
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+  transition: background-color 180ms ease, border-color 180ms ease,
+    color 180ms ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.card input,
+.card textarea,
+.card select {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.card input:focus,
+.card textarea:focus,
+.card select:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.12);
+  border-color: var(--primary);
+}
+
+.theme-toggle {
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+  z-index: 60;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
