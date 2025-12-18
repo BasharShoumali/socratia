@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "../register/Register.module.css";
-import { useAuth } from "../../contexts/useAuth.js";
+import { useAuth } from "../../hooks/useAuth.js";
 
 const Login = ({ navigate } = {}) => {
   const { login } = useAuth();

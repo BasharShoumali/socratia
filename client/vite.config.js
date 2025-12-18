@@ -1,18 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import tailwindcss from "@tailwindcss/vite"; // <-- Import the plugin
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(), // <-- Add it here
-  ],
+  plugins: [react(), tailwindcss()],
 
   server: {
-    // Configure the development server
     port: 3000,
     open: true,
+
+    // 🔥 VERY IMPORTANT: Proxy API requests to backend
+    proxy: {
+      "/api": {
+        target: "http://localhost:5000", // backend server
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
-  envPrefix: "VITE_", // Prefix for environment variables
+
+  envPrefix: "VITE_",
 });
