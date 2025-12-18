@@ -52,14 +52,10 @@ const Register = ({ navigate } = {}) => {
         body: JSON.stringify(form),
       });
 
+      const json = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const json = await res.json().catch(() => ({}));
-        // Treat 4xx (expected) errors (e.g. existing user) as normal user-facing
-        // errors and set them into component state instead of throwing an Error
-        // (which can appear in the browser console as a red error). This keeps
-        // the console clean while still showing the message to the user.
-        const msg = json.message || "Registration failed";
-        setError(msg);
+        setError(json.message || "Registration failed");
         setLoading(false);
         return;
       }
@@ -74,14 +70,7 @@ const Register = ({ navigate } = {}) => {
         password: "",
       });
 
-      // Optionally redirect to login page after a short delay
-      setTimeout(() => {
-        if (navigate) navigate("/login");
-        else if (window.location.pathname !== "/login") {
-          window.history.pushState({}, "", "/login");
-          window.dispatchEvent(new PopStateEvent("popstate"));
-        }
-      }, 1200);
+      setTimeout(() => navigate?.("/login"), 1200);
     } catch (err) {
       setError(err.message || "An error occurred");
     } finally {
@@ -91,97 +80,61 @@ const Register = ({ navigate } = {}) => {
 
   return (
     <div
-      className={`card w-full mx-auto mt-12 p-6 border rounded shadow-sm ${styles.container}`}
+      className={`
+        card w-full mx-auto mt-12 p-6 border rounded shadow-sm
+        bg-white dark:bg-gray-900
+        text-gray-900 dark:text-gray-100
+        border-gray-200 dark:border-gray-700
+        ${styles.container}
+      `}
     >
       <h2 className="text-2xl font-semibold mb-4">Create an account</h2>
 
-      {error && <div className="mb-4 text-red-700">{error}</div>}
-      {success && <div className="mb-4 text-green-700">{success}</div>}
+      {error && <div className="mb-4 text-red-500">{error}</div>}
+      {success && <div className="mb-4 text-green-500">{success}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-3">
-        <div>
-          <label className="block text-sm mb-1">First name</label>
-          <input
-            name="firstName"
-            value={form.firstName}
-            onChange={handleChange}
-            className={`w-full px-2 py-1 rounded ${styles.input}`}
-          />
-        </div>
+        {[
+          "firstName",
+          "lastName",
+          "username",
+          "phone",
+          "email",
+          "password",
+        ].map((key) => (
+          <div key={key}>
+            <label className="block text-sm mb-1">{key}</label>
+            <input
+              name={key}
+              type={key === "password" ? "password" : "text"}
+              value={form[key]}
+              onChange={handleChange}
+              className="
+                  w-full px-3 py-2 rounded 
+                  bg-gray-100 dark:bg-gray-800
+                  text-gray-900 dark:text-gray-100
+                  border border-gray-300 dark:border-gray-700
+                "
+            />
+          </div>
+        ))}
 
-        <div>
-          <label className="block text-sm mb-1">Last name</label>
-          <input
-            name="lastName"
-            value={form.lastName}
-            onChange={handleChange}
-            className={`w-full px-2 py-1 rounded ${styles.input}`}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Username</label>
-          <input
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            className={`w-full px-2 py-1 rounded ${styles.input}`}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Phone number</label>
-          <input
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            className={`w-full px-2 py-1 rounded ${styles.input}`}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Email</label>
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            className={`w-full px-2 py-1 rounded ${styles.input}`}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Password</label>
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            className={`w-full px-2 py-1 rounded ${styles.input}`}
-          />
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full btn-primary disabled:opacity-60"
-          >
-            {loading ? "Registering…" : "Register"}
-          </button>
-        </div>
+        <button
+          disabled={loading}
+          className="
+            w-full py-2 rounded 
+            bg-indigo-600 hover:bg-indigo-700 text-white
+            dark:bg-indigo-500 dark:hover:bg-indigo-600
+          "
+        >
+          {loading ? "Registering…" : "Register"}
+        </button>
 
         <div className="text-center">
           <button
             type="button"
-            className={styles.link}
-            onClick={() => {
-              if (navigate) navigate("/login");
-              else {
-                window.history.pushState({}, "", "/login");
-                window.dispatchEvent(new PopStateEvent("popstate"));
-              }
-            }}
+            className={`${styles.link} text-indigo-600 dark:text-indigo-400`}
+            onClick={() => navigate?.("/login")}
           >
             I have an account
           </button>
