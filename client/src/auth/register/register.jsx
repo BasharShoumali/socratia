@@ -54,7 +54,14 @@ const Register = ({ navigate } = {}) => {
 
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        throw new Error(json.message || "Registration failed");
+        // Treat 4xx (expected) errors (e.g. existing user) as normal user-facing
+        // errors and set them into component state instead of throwing an Error
+        // (which can appear in the browser console as a red error). This keeps
+        // the console clean while still showing the message to the user.
+        const msg = json.message || "Registration failed";
+        setError(msg);
+        setLoading(false);
+        return;
       }
 
       setSuccess("Registration successful. You can now log in.");

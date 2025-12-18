@@ -1,19 +1,36 @@
-import { connectDB } from "./config/db.js";
-import app from "./app.js";
 import dotenv from "dotenv";
 dotenv.config();
 
-const PORT = 5000;
+import { connectDB } from "./config/db.js";
+import app from "./app.js";
+
+/* ----------------------------------------------------- */
+/*  CLEAN URI                                            */
+/* ----------------------------------------------------- */
+const CLEAN_URI = process.env.MONGO_URI
+  ? process.env.MONGO_URI.trim().replace(/;$/, "")
+  : null;
+
+/* ----------------------------------------------------- */
+/*  START SERVER                                         */
+/* ----------------------------------------------------- */
+
+const PORT = process.env.PORT || 5000;
 
 const start = async () => {
   try {
-    await connectDB();
+    if (!CLEAN_URI) {
+      throw new Error("MONGO_URI is missing after cleaning. Cannot connect.");
+    }
+
+    console.log("🔍 Attempting DB connection...");
+    await connectDB(CLEAN_URI);
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server listening on port ${PORT}`);
+      console.log(`🔥 Server is running on http://localhost:${PORT}`);
     });
   } catch (err) {
-    console.error("❌ Failed to start server:", err);
+    console.error("❌ SERVER STARTUP FAILURE");
     process.exit(1);
   }
 };
