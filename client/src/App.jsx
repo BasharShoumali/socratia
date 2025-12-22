@@ -38,11 +38,20 @@ function useTheme() {
 
 /* -------------------- Router Wrapper -------------------- */
 
-function AppRoutes() {
+function AppRoutes({ selectedChat, onChatsUpdated }) {
   const navigate = useNavigate();
   return (
     <Routes>
-      <Route path="/" element={<Homepage navigate={navigate} />} />
+      <Route
+        path="/"
+        element={
+          <Homepage
+            navigate={navigate}
+            selectedChat={selectedChat}
+            onChatsUpdated={onChatsUpdated}
+          />
+        }
+      />
       <Route path="/register" element={<Register navigate={navigate} />} />
       <Route path="/login" element={<Login navigate={navigate} />} />
       <Route path="*" element={<NotFound navigate={navigate} />} />
@@ -55,6 +64,8 @@ function AppRoutes() {
 export default function App() {
   const [theme, setTheme] = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedChat, setSelectedChat] = useState(undefined);
+  const [chatsRefreshKey, setChatsRefreshKey] = useState(0);
 
   return (
     <BrowserRouter>
@@ -62,7 +73,12 @@ export default function App() {
         {/* ENTIRE LAYOUT */}
         <div className="flex w-full min-h-screen">
           {/* SIDEBAR */}
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <Sidebar
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            onSelectChat={setSelectedChat}
+            chatsRefreshKey={chatsRefreshKey}
+          />
 
           {/* PAGE CONTENT WRAPPER */}
           <div className="flex flex-col flex-1 md:pl-64">
@@ -98,7 +114,10 @@ export default function App() {
 
             {/* MAIN CONTENT */}
             <main className="p-6 flex-1">
-              <AppRoutes />
+              <AppRoutes
+                selectedChat={selectedChat}
+                onChatsUpdated={() => setChatsRefreshKey((k) => k + 1)}
+              />
             </main>
           </div>
         </div>

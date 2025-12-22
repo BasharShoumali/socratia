@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import FilesPanel from "./FilesPanel";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import { useAuth } from "../hooks/useAuth.js";
 
-export default function Homepage() {
+export default function Homepage({ selectedChat, onChatsUpdated }) {
   const { user } = useAuth();
 
   // Backend chat state
@@ -21,17 +21,17 @@ export default function Homepage() {
     { id: 3, name: "Diagram.png", type: "image" },
   ]);
 
-  // Scroll to bottom on every message update
+  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   /* ------------------------------------------
-     LOAD EXISTING CHAT (from sidebar)
+     LOAD EXISTING CHAT (SAFE VERSION)
   ------------------------------------------- */
-  async function loadChat(chat) {
+
+  const loadChat = useCallback((chat) => {
     if (!chat) {
-      // Start fresh
       setChatNumber(null);
       setMessages([]);
       setTitle("New Chat");
@@ -41,7 +41,15 @@ export default function Homepage() {
     setChatNumber(chat.chatNumber);
     setMessages(chat.messages);
     setTitle(chat.title || "Untitled Chat");
-  }
+  }, []);
+
+  // When sidebar selects a chat → load it
+  useEffect(() => {
+    if (selectedChat !== undefined) {
+      // defer state update to avoid synchronous setState warning
+      queueMicrotask(() => loadChat(selectedChat));
+    }
+  }, [selectedChat, loadChat]);
 
   /* ------------------------------------------
      UPDATE CHAT TITLE
@@ -60,6 +68,8 @@ export default function Homepage() {
         title: newTitle,
       }),
     });
+
+    if (onChatsUpdated) onChatsUpdated();
   }
 
   /* ------------------------------------------
@@ -81,12 +91,15 @@ export default function Homepage() {
       setChatNumber(data.chat.chatNumber);
       setMessages(data.chat.messages);
       setTitle(data.chat.title || "New Chat");
+
+      if (onChatsUpdated) onChatsUpdated();
+
       return data.chat;
     }
   }
 
   /* ------------------------------------------
-     APPEND NEXT MESSAGE IN SAME CHAT
+     APPEND MESSAGE
   ------------------------------------------- */
   async function appendMessage(message, answer = "") {
     const res = await fetch("/api/chat/append", {
@@ -108,7 +121,7 @@ export default function Homepage() {
   }
 
   /* ------------------------------------------
-     SEND MESSAGE LOGIC
+     SEND MESSAGE
   ------------------------------------------- */
   async function sendMessage() {
     if (!input.trim()) return;
@@ -116,19 +129,16 @@ export default function Homepage() {
     const userMessage = input;
     setInput("");
 
-    // CASE 1: first message → start new chat
+    // If first message → create new chat
     if (!chatNumber) {
-      const newChat = await startChat(userMessage);
+      const NewChat = await startChat(userMessage);
 
-      // Add welcome reply inside SAME entry
       await appendMessage("", "Welcome! Chat started successfully.");
-
       return;
     }
 
-    // CASE 2: Existing chat → append message
-    const botReply = `You said: "${userMessage}"`; // Placeholder AI
-
+    // Existing chat
+    const botReply = `You said: "${userMessage}"`; // Temporary bot
     await appendMessage(userMessage, botReply);
   }
 
@@ -155,7 +165,7 @@ export default function Homepage() {
             )}
           </div>
 
-          {/* Chat bubbles */}
+          {/* Chat Messages */}
           <ChatMessages messages={messages} messagesEndRef={messagesEndRef} />
 
           {/* Chat Input */}

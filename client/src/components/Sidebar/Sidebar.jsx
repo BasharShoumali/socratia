@@ -5,7 +5,13 @@ import SidebarTip from "./SidebarTip";
 import SidebarChatItem from "./SidebarChatItem";
 import { useAuth } from "../../hooks/useAuth.js";
 
-export default function Sidebar({ navigate, isOpen, onClose, onSelectChat }) {
+export default function Sidebar({
+  navigate,
+  isOpen,
+  onClose,
+  onSelectChat,
+  chatsRefreshKey,
+}) {
   const { user, logout } = useAuth();
   const [chats, setChats] = useState([]);
 
@@ -22,7 +28,7 @@ export default function Sidebar({ navigate, isOpen, onClose, onSelectChat }) {
 
   useEffect(() => {
     loadChats();
-  }, [user]);
+  }, [user, chatsRefreshKey]);
 
   return (
     <>
